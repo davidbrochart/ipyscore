@@ -42,6 +42,7 @@ export class WidgetModel extends DOMWidgetModel {
       _new_voice_id: '',
       _new_stave_id: '',
       _new_clef: false,
+      _new_connector: false,
       _new_time_signature: false,
       _draw: false,
     };
@@ -68,6 +69,7 @@ export class WidgetView extends DOMWidgetView {
     this.model.on('change:_new_voice_id', this.newScoreVoice, this);
     this.model.on('change:_new_stave_id', this.addStave, this);
     this.model.on('change:_new_clef', this.addClef, this);
+    this.model.on('change:_new_connector', this.addConnector, this);
     this.model.on('change:_new_time_signature', this.addTimeSignature, this);
     this.model.on('change:_draw', this.draw, this);
 
@@ -139,6 +141,11 @@ export class WidgetView extends DOMWidgetView {
     const stave_id = this.model.get('_stave_id');
     const clef = this.model.get('_clef');
     this.staves[stave_id].addClef(clef);
+  }
+
+  addConnector() {
+    const system_id = this.model.get('_system_id');
+    this.systems[system_id].addConnector();
   }
 
   addTimeSignature() {

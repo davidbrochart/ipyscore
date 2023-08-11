@@ -42,6 +42,7 @@ class Widget(DOMWidget):
     _new_voice_id = Unicode().tag(sync=True)
     _new_stave_id = Unicode().tag(sync=True)
     _new_clef = Bool().tag(sync=True)
+    _new_connector = Bool().tag(sync=True)
     _new_time_signature = Bool().tag(sync=True)
     _draw = Bool().tag(sync=True)
 
@@ -62,9 +63,9 @@ class Score:
         self.id = id_
         self.widget = widget
 
-    def notes(self, notes: str, notes_options = {}):
+    def notes(self, notes: str, **options):
         self.widget._notes = notes
-        self.widget._notes_options = notes_options
+        self.widget._notes_options = options
         self.widget._score_id = self.id
         self.widget._new_notes_id = uuid4().hex
         return Notes(self.widget._new_notes_id)
@@ -81,12 +82,16 @@ class System:
         self.id = id_
         self.widget = widget
 
-    def add_stave(self, options):
+    def add_stave(self, **options):
         self.widget._system_id = self.id
         if "voices" in options:
             self.widget._voice_ids = [voice.id for voice in options["voices"]]
         self.widget._new_stave_id = uuid4().hex
         return Stave(self.widget._new_stave_id, self.widget)
+
+    def add_connector(self):
+        self.widget._system_id = self.id
+        self.widget._new_connector = not self.widget._new_connector
 
 
 class Notes:
