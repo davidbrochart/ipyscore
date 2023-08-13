@@ -34,16 +34,20 @@ export class WidgetModel extends DOMWidgetModel {
       _system_id: '',
       _score_id: '',
       _notes_id: '',
+      _other_notes_id: '',
       _notes: '',
       _notes_options: {},
       _new_score_id: '',
       _new_system_id: '',
       _new_notes_id: '',
+      _new_beam_id: '',
+      _new_tuplet_id: '',
       _new_voice_id: '',
       _new_stave_id: '',
       _new_clef: false,
       _new_connector: false,
       _new_time_signature: false,
+      _concat_notes_id: '',
       _draw: false,
     };
   }
@@ -66,11 +70,14 @@ export class WidgetView extends DOMWidgetView {
     this.model.on('change:_new_score_id', this.newScore, this);
     this.model.on('change:_new_system_id', this.newSystem, this);
     this.model.on('change:_new_notes_id', this.newScoreNotes, this);
+    this.model.on('change:_new_beam_id', this.newScoreBeam, this);
+    this.model.on('change:_new_tuplet_id', this.newScoreTuplet, this);
     this.model.on('change:_new_voice_id', this.newScoreVoice, this);
     this.model.on('change:_new_stave_id', this.addStave, this);
     this.model.on('change:_new_clef', this.addClef, this);
     this.model.on('change:_new_connector', this.addConnector, this);
     this.model.on('change:_new_time_signature', this.addTimeSignature, this);
+    this.model.on('change:_concat_notes_id', this.concatNotes, this);
     this.model.on('change:_draw', this.draw, this);
 
     const { Renderer } = Vex.Flow;
@@ -118,6 +125,22 @@ export class WidgetView extends DOMWidgetView {
 
   }
 
+  newScoreBeam() {
+    const score_id = this.model.get('_score_id');
+    const notes_id = this.model.get('_notes_id');
+    const notes = this.notes[notes_id];
+    const new_beam_id = this.model.get('_new_beam_id');
+    this.notes[new_beam_id] = this.scores[score_id].beam(notes);
+  }
+
+  newScoreTuplet() {
+    const score_id = this.model.get('_score_id');
+    const notes_id = this.model.get('_notes_id');
+    const notes = this.notes[notes_id];
+    const new_tuplet_id = this.model.get('_new_tuplet_id');
+    this.notes[new_tuplet_id] = this.scores[score_id].tuplet(notes);
+  }
+
   newScoreVoice() {
     const score_id = this.model.get('_score_id');
     const notes_id = this.model.get('_notes_id');
@@ -156,6 +179,15 @@ export class WidgetView extends DOMWidgetView {
 
   draw() {
     this.vf.draw();
+  }
+
+  concatNotes() {
+    const notes_id = this.model.get('_notes_id');
+    const other_notes_id = this.model.get('_other_notes_id');
+    const concat_notes_id = this.model.get('_concat_notes_id');
+    const notes = this.notes[notes_id];
+    const other_notes = this.notes[other_notes_id];
+    this.notes[concat_notes_id] = notes.concat(other_notes);
   }
 
   vf: Vex.Factory;
