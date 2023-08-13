@@ -4,7 +4,7 @@ ipyscore
 
 Version: |release|
 
-A Jupyter widget for creating music notation
+A Jupyter widget for rendering music notation
 
 
 Quickstart
