@@ -1,19 +1,15 @@
 [build-system]
-requires = [
-    "hatchling>=1.3.1",
-    "jupyterlab==3.*",
-]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
 name = "ipyscore"
-description = "A Jupyter widget for music notation"
+dynamic = ["version"]
+description = "A Jupyter widget for rendering music notation"
 readme = "README.md"
 license = { file = "LICENSE.txt" }
 requires-python = ">=3.7"
-authors = [
-    { name = "David Brochart", email = "david.brochart@gmail.com" },
-]
+authors = [{ name = "David Brochart", email = "david.brochart@gmail.com" }]
 keywords = [
     "IPython",
     "Jupyter",
@@ -32,26 +28,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
 ]
 dependencies = [
-    "ipywidgets>=7.0.0",
-]
-version = "0.1.4"
-
-[project.optional-dependencies]
-docs = [
-    "jupyter_sphinx",
-    "nbsphinx",
-    "nbsphinx-link",
-    "pypandoc",
-    "pytest_check_links",
-    "recommonmark",
-    "sphinx>=1.5",
-    "sphinx_rtd_theme",
-]
-examples = []
-test = [
-    "nbval",
-    "pytest-cov",
-    "pytest>=6.0",
+    "anywidget >=0.6.3,<1",
 ]
 
 [project.urls]
@@ -59,54 +36,8 @@ Homepage = "https://github.com/davidbrochart/ipyscore"
 
 [tool.hatch.build]
 artifacts = [
-    "ipyscore/nbextension/index.*",
-    "ipyscore/labextension/*.tgz",
-    "ipyscore/labextension",
+    "ipyscore/static/index.js",
 ]
 
-[tool.hatch.build.targets.wheel.shared-data]
-"ipyscore/nbextension" = "share/jupyter/nbextensions/ipyscore"
-"ipyscore/labextension" = "share/jupyter/labextensions/ipyscore"
-"./install.json" = "share/jupyter/labextensions/ipyscore/install.json"
-"./ipyscore.json" = "etc/jupyter/nbconfig/notebook.d/ipyscore.json"
-
-[tool.hatch.build.targets.sdist]
-exclude = [
-    ".github",
-]
-
-[tool.hatch.build.hooks.jupyter-builder]
-build-function = "hatch_jupyter_builder.npm_builder"
-ensured-targets = [
-    "ipyscore/nbextension/index.js",
-    "ipyscore/labextension/package.json",
-]
-skip-if-exists = [
-    "ipyscore/nbextension/index.js",
-    "ipyscore/labextension/package.json",
-]
-dependencies = [
-    "hatch-jupyter-builder>=0.5.0",
-]
-
-[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-path = "."
-build_cmd = "build:prod"
-
-[tool.tbump]
-field = [
-    { name = "channel", default = "" },
-    { name = "release", default = "" },
-]
-file = [
-    { src = "pyproject.toml", version_template = "version = \"{major}.{minor}.{patch}{channel}{release}\"" },
-    { src = "ipyscore/_version.py" },
-]
-
-[tool.tbump.version]
-current = "0.1.4"
-regex = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)((?P<channel>a|b|rc|.dev)(?P<release>\\d+))?"
-
-[tool.tbump.git]
-message_template = "Bump to {new_version}"
-tag_template = "v{new_version}"
+[tool.hatch.version]
+path = "ipyscore/__init__.py"

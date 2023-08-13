@@ -1,29 +1,18 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 # Copyright (c) David Brochart.
 # Distributed under the terms of the Modified BSD License.
 
-"""
-TODO: Add module docstring
-"""
-
+from pathlib import Path
 from uuid import uuid4
 
-from ipywidgets import DOMWidget
+from anywidget import AnyWidget
 from traitlets import Bool, Dict, Int, List, Unicode
-from ._frontend import module_name, module_version
 
 
-class Widget(DOMWidget):
-    """TODO: Add docstring here
-    """
-    _model_name = Unicode("WidgetModel").tag(sync=True)
-    _model_module = Unicode(module_name).tag(sync=True)
-    _model_module_version = Unicode(module_version).tag(sync=True)
-    _view_name = Unicode("WidgetView").tag(sync=True)
-    _view_module = Unicode(module_name).tag(sync=True)
-    _view_module_version = Unicode(module_version).tag(sync=True)
+bundler_output_dir = Path(__file__).parent / "static"
+
+
+class Widget(AnyWidget):
+    _esm = bundler_output_dir / "index.js"
 
     width = Int(500).tag(sync=True)
     height = Int(500).tag(sync=True)

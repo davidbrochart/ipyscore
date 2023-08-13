@@ -175,7 +175,7 @@ texinfo_documents = [
      'ipyscore Documentation',
      author,
      'ipyscore',
-     'A Jupyter widget for music notation',
+     'A Jupyter widget for rendering music notation',
      'Miscellaneous'),
 ]
 

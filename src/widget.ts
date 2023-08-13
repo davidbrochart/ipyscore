@@ -1,131 +1,75 @@
 // Copyright (c) David Brochart
 // Distributed under the terms of the Modified BSD License.
 
-import {
-  DOMWidgetModel,
-  DOMWidgetView,
-  ISerializers,
-} from '@jupyter-widgets/base';
-
-import { MODULE_NAME, MODULE_VERSION } from './version';
-
-// Import the CSS
-import '../css/widget.css';
-
 import * as Vex from 'vexflow';
 
-export class WidgetModel extends DOMWidgetModel {
-  defaults() {
-    return {
-      ...super.defaults(),
-      _model_name: WidgetModel.model_name,
-      _model_module: WidgetModel.model_module,
-      _model_module_version: WidgetModel.model_module_version,
-      _view_name: WidgetModel.view_name,
-      _view_module: WidgetModel.view_module,
-      _view_module_version: WidgetModel.view_module_version,
+export function render({ model, el }) {
+  const { Renderer } = Vex.Flow;
 
-      width: 500,
-      height: 500,
-      _voice_ids: [],
-      _clef: '',
-      _stave_id: '',
-      _time_signature: '',
-      _system_id: '',
-      _score_id: '',
-      _notes_id: '',
-      _other_notes_id: '',
-      _notes: '',
-      _notes_options: {},
-      _new_score_id: '',
-      _new_system_id: '',
-      _new_notes_id: '',
-      _new_beam_id: '',
-      _new_tuplet_id: '',
-      _new_voice_id: '',
-      _new_stave_id: '',
-      _new_clef: false,
-      _new_connector: false,
-      _new_time_signature: false,
-      _concat_notes_id: '',
-      _draw: false,
-    };
-  }
+  const div = document.createElement("div");
+  el.append(div);
 
-  static serializers: ISerializers = {
-    ...DOMWidgetModel.serializers,
-    // Add any extra serializers here
-  };
+  const renderer = new Renderer(div, Renderer.Backends.SVG);
 
-  static model_name = 'WidgetModel';
-  static model_module = MODULE_NAME;
-  static model_module_version = MODULE_VERSION;
-  static view_name = 'WidgetView'; // Set to null if no view
-  static view_module = MODULE_NAME; // Set to null if no view
-  static view_module_version = MODULE_VERSION;
+  const width = model.get('width');
+  const height = model.get('height');
+
+  renderer.resize(width, height);
+  const context = renderer.getContext();
+  context.setFont('Arial', 10);
+
+  let vf: Vex.Factory = new Vex.Flow.Factory({renderer: { elementId: null, width: 0, height: 0 }});
+  vf.setContext(context);
+
+  new Widget(model, vf);
 }
 
-export class WidgetView extends DOMWidgetView {
-  render() {
-    this.model.on('change:_new_score_id', this.newScore, this);
-    this.model.on('change:_new_system_id', this.newSystem, this);
-    this.model.on('change:_new_notes_id', this.newScoreNotes, this);
-    this.model.on('change:_new_beam_id', this.newScoreBeam, this);
-    this.model.on('change:_new_tuplet_id', this.newScoreTuplet, this);
-    this.model.on('change:_new_voice_id', this.newScoreVoice, this);
-    this.model.on('change:_new_stave_id', this.addStave, this);
-    this.model.on('change:_new_clef', this.addClef, this);
-    this.model.on('change:_new_connector', this.addConnector, this);
-    this.model.on('change:_new_time_signature', this.addTimeSignature, this);
-    this.model.on('change:_concat_notes_id', this.concatNotes, this);
-    this.model.on('change:_draw', this.draw, this);
 
-    const { Renderer } = Vex.Flow;
-
-    const div = document.createElement("div");
-    this.el.append(div);
-
-    const renderer = new Renderer(div, Renderer.Backends.SVG);
-
-    const width = this.model.get('width');
-    const height = this.model.get('height');
-
-    renderer.resize(width, height);
-    const context = renderer.getContext();
-    context.setFont('Arial', 10);
-
-    this.vf = new Vex.Flow.Factory({renderer: { elementId: null, width: 0, height: 0 }});
-    this.vf.setContext(context);
-
+class Widget {
+  constructor(model, vf) {
+    this.model = model;
+    this.vf = vf;
     this.scores = {};
     this.systems = {};
     this.notes = {};
     this.voices = {};
     this.staves = {};
+
+    model.on('change:_new_score_id', this.newScore);
+    model.on('change:_new_system_id', this.newSystem);
+    model.on('change:_new_notes_id', this.newScoreNotes);
+    model.on('change:_new_beam_id', this.newScoreBeam);
+    model.on('change:_new_tuplet_id', this.newScoreTuplet);
+    model.on('change:_new_voice_id', this.newScoreVoice);
+    model.on('change:_new_stave_id', this.addStave);
+    model.on('change:_new_clef', this.addClef);
+    model.on('change:_new_connector', this.addConnector);
+    model.on('change:_new_time_signature', this.addTimeSignature);
+    model.on('change:_concat_notes_id', this.concatNotes);
+    model.on('change:_draw', this.draw);
   }
 
-  newScore() {
+  newScore = () => {
     const score = this.vf.EasyScore();
-    const id = this.model.get('_new_score_id');
-    this.scores[id] = score;
+    const new_score_id = this.model.get('_new_score_id');
+    this.scores[new_score_id] = score;
   }
 
-  newSystem() {
+  newSystem = () => {
     const system = this.vf.System();
-    const id = this.model.get('_new_system_id');
-    this.systems[id] = system;
+    const new_system_id = this.model.get('_new_system_id');
+    this.systems[new_system_id] = system;
   }
 
-  newScoreNotes() {
+  newScoreNotes = () => {
     const score_id = this.model.get('_score_id');
     const new_notes_id = this.model.get('_new_notes_id');
     const notes = this.model.get('_notes');
     const notes_options = this.model.get('_notes_options');
     this.notes[new_notes_id] = this.scores[score_id].notes(notes, notes_options);
-
   }
 
-  newScoreBeam() {
+  newScoreBeam = () => {
     const score_id = this.model.get('_score_id');
     const notes_id = this.model.get('_notes_id');
     const notes = this.notes[notes_id];
@@ -133,7 +77,7 @@ export class WidgetView extends DOMWidgetView {
     this.notes[new_beam_id] = this.scores[score_id].beam(notes);
   }
 
-  newScoreTuplet() {
+  newScoreTuplet = () => {
     const score_id = this.model.get('_score_id');
     const notes_id = this.model.get('_notes_id');
     const notes = this.notes[notes_id];
@@ -141,14 +85,14 @@ export class WidgetView extends DOMWidgetView {
     this.notes[new_tuplet_id] = this.scores[score_id].tuplet(notes);
   }
 
-  newScoreVoice() {
+  newScoreVoice = () => {
     const score_id = this.model.get('_score_id');
     const notes_id = this.model.get('_notes_id');
     const new_voice_id = this.model.get('_new_voice_id');
     this.voices[new_voice_id] = this.scores[score_id].voice(this.notes[notes_id]);
   }
 
-  addStave() {
+  addStave = () => {
     const system_id = this.model.get('_system_id');
     const new_stave_id = this.model.get('_new_stave_id');
     const voice_ids = this.model.get('_voice_ids');
@@ -160,28 +104,28 @@ export class WidgetView extends DOMWidgetView {
     this.staves[new_stave_id] = this.systems[system_id].addStave({voices});
   }
 
-  addClef() {
+  addClef = () => {
     const stave_id = this.model.get('_stave_id');
     const clef = this.model.get('_clef');
     this.staves[stave_id].addClef(clef);
   }
 
-  addConnector() {
+  addConnector = () => {
     const system_id = this.model.get('_system_id');
     this.systems[system_id].addConnector();
   }
 
-  addTimeSignature() {
+  addTimeSignature = () => {
     const stave_id = this.model.get('_stave_id');
     const time_signature = this.model.get('_time_signature');
     this.staves[stave_id].addTimeSignature(time_signature);
   }
 
-  draw() {
+  draw = () => {
     this.vf.draw();
   }
 
-  concatNotes() {
+  concatNotes = () => {
     const notes_id = this.model.get('_notes_id');
     const other_notes_id = this.model.get('_other_notes_id');
     const concat_notes_id = this.model.get('_concat_notes_id');
