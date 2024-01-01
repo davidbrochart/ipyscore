@@ -12,7 +12,7 @@ bundler_output_dir = Path(__file__).parent / "static"
 
 
 class Widget(AnyWidget):
-    _esm = bundler_output_dir / "index.js"
+    _esm = bundler_output_dir / "vexflow_index.js"
 
     width = Int(500).tag(sync=True)
     height = Int(500).tag(sync=True)

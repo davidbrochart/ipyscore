@@ -153,3 +153,6 @@ ipyscore/nbextension/index.*
 
 # Packed lab extensions
 ipyscore/labextension
+# pixi environments
+.pixi
+
