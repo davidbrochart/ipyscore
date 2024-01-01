@@ -25,5 +25,6 @@ npm install
 Install the Python package and build the TypeScript package.
 ```bash
 pip install -e .
-node_modules/.bin/esbuild --bundle --format=esm --outdir=ipyscore/static src/index.ts
+node_modules/.bin/esbuild --bundle --format=esm --outdir=ipyscore/static src/vexflow_index.ts
+node_modules/.bin/esbuild --bundle --format=esm --outdir=ipyscore/static src/smoosic_index.ts
 ```

@@ -1,7 +1,7 @@
 // Copyright (c) David Brochart
 // Distributed under the terms of the Modified BSD License.
 
-import * as Vex from 'vexflow';
+import * as Vex from './vexflow-debug';
 
 export function render({ model, el }) {
   const { Renderer } = Vex.Flow;

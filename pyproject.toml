@@ -29,6 +29,7 @@ classifiers = [
 ]
 dependencies = [
     "anywidget >=0.6.3,<1",
+    "ipyevents",
 ]
 
 [project.urls]
@@ -41,3 +42,7 @@ artifacts = [
 
 [tool.hatch.version]
 path = "ipyscore/__init__.py"
+
+[tool.hatch.build.targets.wheel.shared-data]
+"etc/jupyter/jupyter_server_config.d" = "etc/jupyter/jupyter_server_config.d"
+"etc/jupyter/jupyter_notebook_config.d" = "etc/jupyter/jupyter_notebook_config.d"
